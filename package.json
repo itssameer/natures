@@ -1,0 +1,25 @@
+{
+  "name": "natures",
+  "version": "1.0.0",
+  "description": "major project to learn node and mongodb",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itssameer/natures.git"
+  },
+  "keywords": [
+    "natures"
+  ],
+  "author": "Sameer",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/itssameer/natures/issues"
+  },
+  "homepage": "https://github.com/itssameer/natures#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

@@ -1,22 +1,31 @@
 const fs = require('fs');
-const express = require('express');
 
 //JSON.parse() functions coverts string into json
-const tours = JSON.parse(
+tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8')
 );
 
-const getAllTours = (req, res) => {
+exports.checkId = (req, res, next, val) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid Id',
+    });
+  }
+  next();
+};
+
+exports.getAllTours = (req, res) => {
   res.status(200).json({ status: 'Success', result: tours.length, tours });
 };
 
-const getTourById = (req, res) => {
+exports.getTourById = (req, res) => {
   id = req.params.id * 1;
   const tour = tours.find((el) => el.id === id);
   res.status(200).json(tour);
 };
 
-const insertAtour = (req, res) => {
+exports.insertAtour = (req, res) => {
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, req.body);
 
@@ -35,27 +44,13 @@ const insertAtour = (req, res) => {
   );
 };
 
-const updateAtourById = (req, res) => {
+exports.updateAtourById = (req, res) => {
   res.send('in patch');
   tour.req.body;
 };
 
-const deleteTour = (req, res) => {
+exports.deleteTour = (req, res) => {
   res.status(204).json({
     status: 'success',
   });
 };
-
-const Router = express.Router();
-
-Router.route('/').get(getAllTours).post(insertAtour);
-Router.route('/:id').get(getTourById).patch(updateAtourById).delete(deleteTour);
-
-module.exports = Router;
-
-/****************************************************************
- * Sub routes:
- * first app.use() will get the req as it is the middle ware
- * then it will direct that request to eiter tourHandler or userHandler as these are the sub routes( and also the middleware)
- * so request will go through these routes too.
- */

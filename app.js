@@ -3,8 +3,8 @@ const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan'); //its a middle to log request into console for INFO
 
-const tourRoute = require('./Routers/tourHandler');
-const userRoute = require('./Routers/userHandler');
+const tourRoute = require('./Routers/tourRoute');
+const userRoute = require('./Routers/userRoute');
 
 const app = express();
 
@@ -18,8 +18,6 @@ app.use((req, res, next) => {
   next();
 });
 
-let PORT = 3000;
-
 /*
 app.get('/api/v1/tours', getAllTours);
 app.get('/api/v1/tours/:id', getTourById);
@@ -32,6 +30,4 @@ app.delete('/api/v1/tours/:id', deleteTour);
 app.use('/api/v1/tours', tourRoute); // Mounting the new router to a tourRoute.
 app.use('/api/v1/users', userRoute); // Mounting the new router to a userRoute.
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`app running on port ${PORT}`);
-});
+module.exports = app;

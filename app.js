@@ -7,10 +7,13 @@ const tourRoute = require('./Routers/tourRoute');
 const userRoute = require('./Routers/userRoute');
 
 const app = express();
-
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 app.use(express.json()); // ***express.json add the incoming body data to request object.
+
+app.use(express.static(`${__dirname}/public/`));
 
 app.use((req, res, next) => {
   // Custom middleware

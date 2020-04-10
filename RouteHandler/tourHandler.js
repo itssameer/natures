@@ -5,6 +5,18 @@ tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8')
 );
 
+exports.checkBody = (req, res, next) => {
+  console.log(req.body);
+  if (!req.body.name || !req.body.price) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'bad request',
+    });
+  }
+
+  next();
+};
+
 exports.checkId = (req, res, next, val) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
@@ -32,7 +44,7 @@ exports.insertAtour = (req, res) => {
   tours.push(newTour);
 
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => {
       if (err)

@@ -11,9 +11,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use(express.json()); // ***express.json add the incoming body data to request object.
+app.use(express.json()); // ***express.json add the incoming json data to request object.
 
-app.use(express.static(`${__dirname}/public/`));
+app.use(express.static(`${__dirname}/public/`)); //express.static() method is for static hosting
 
 app.use((req, res, next) => {
   // Custom middleware
@@ -30,7 +30,7 @@ app.delete('/api/v1/tours/:id', deleteTour);
 */
 //we use route to chain same routes above routes can be written as
 
-app.use('/api/v1/tours', tourRoute); // Mounting the new router to a tourRoute.
+app.use('/api/v1/tours', tourRoute); // Mounting the new router to a tourRoute.(sub-application)
 app.use('/api/v1/users', userRoute); // Mounting the new router to a userRoute.
 
 module.exports = app;

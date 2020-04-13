@@ -1,64 +1,42 @@
 const fs = require('fs');
 
-//JSON.parse() functions coverts string into json
-tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8')
-);
+const Tour = require('../models/tourModel');
+exports.getAllTours = async (req, res) => {
+  try {
+    queryObj = { ...req.query }; // we cant assign objects directly as changing queryObj will change req.query
+    const excludeFields = ['page', 'sort', 'limit', 'fields'];
+    excludeFields.forEach((el) => delete queryObj[el]);
+    let queryStr = JSON.stringify(queryObj); // converting JSON  to string for pattern replacement
+    queryStr = queryStr.replace(/\b(gte|gt|lt|lte)\b/g, (match) => `$${match}`);
+    console.log(queryStr);
 
-exports.checkBody = (req, res, next) => {
-  console.log(req.body);
-  if (!req.body.name || !req.body.price) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'bad request',
-    });
+    const query = Tour.find(JSON.parse(queryStr));
+    const tours = await query;
+
+    res.status(200).json({ status: 'Success', result: tours.length, tours });
+  } catch (err) {
+    res.status(400).json({ status: 'Fail', message: err });
   }
-
-  next();
 };
 
-exports.checkId = (req, res, next, val) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid Id',
-    });
+exports.getTourById = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json(tour);
+  } catch (err) {
+    res.status(400).json('something went wrong');
   }
-  next();
 };
 
-exports.getAllTours = (req, res) => {
-  res.status(200).json({ status: 'Success', result: tours.length, tours });
-};
-
-exports.getTourById = (req, res) => {
-  id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-  res.status(200).json(tour);
-};
-
-exports.insertAtour = (req, res) => {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-
-  tours.push(newTour);
-
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      if (err)
-        return res.status(400).json({
-          status: 'failure',
-        });
-      res.json(newTour);
-    }
-  );
+exports.insertAtour = async (req, res) => {
+  // const newTour = await Tour.create(req.body);
+  const newTour = new Tour(req.body);
+  newTour.save();
+  res.json(newTour);
 };
 
 exports.updateAtourById = (req, res) => {
   res.send('in patch');
-  tour.req.body;
 };
 
 exports.deleteTour = (req, res) => {

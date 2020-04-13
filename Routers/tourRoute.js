@@ -3,10 +3,9 @@ const express = require('express');
 
 const Router = express.Router();
 
-Router.param('id', tourController.checkId);
 Router.route('/')
   .get(tourController.getAllTours)
-  .post(tourController.checkBody, tourController.insertAtour);
+  .post(tourController.insertAtour);
 Router.route('/:id')
   .get(tourController.getTourById)
   .patch(tourController.updateAtourById)

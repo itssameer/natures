@@ -3,6 +3,7 @@ const express = require('express');
 
 const Router = express.Router();
 
+Router.route('/tour-stats').get(tourController.getTourStats);
 Router.route('/')
   .get(tourController.getAllTours)
   .post(tourController.insertAtour);

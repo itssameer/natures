@@ -1,22 +1,73 @@
 const fs = require('fs');
 
+const APIFeatures = require('../utils/apiFeatures');
+
 const Tour = require('../models/tourModel');
+
+exports.getTourStats = async (req, res) => {
+  const stats = await Tour.aggregate([
+    {
+      $match: { rating: { $gte: 4.5 } },
+    },
+    {
+      $group: {
+        _id: null,
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+  res.status(200).json(stats);
+};
+
 exports.getAllTours = async (req, res) => {
-  try {
-    queryObj = { ...req.query }; // we cant assign objects directly as changing queryObj will change req.query
-    const excludeFields = ['page', 'sort', 'limit', 'fields'];
-    excludeFields.forEach((el) => delete queryObj[el]);
-    let queryStr = JSON.stringify(queryObj); // converting JSON  to string for pattern replacement
-    queryStr = queryStr.replace(/\b(gte|gt|lt|lte)\b/g, (match) => `$${match}`);
-    console.log(queryStr);
+  /*
+  queryObj = { ...req.query }; // we cant assign objects directly as changing queryObj will change this.queryString
+  const excludeFields = ['page', 'sort', 'limit', 'fields'];
+  excludeFields.forEach((el) => delete queryObj[el]);
+  let queryStr = JSON.stringify(queryObj); // converting JSON  to string for pattern replacement
+  queryStr = queryStr.replace(/\b(gte|gt|lt|lte)\b/g, (match) => `$${match}`);
+  console.log(queryStr);
 
-    const query = Tour.find(JSON.parse(queryStr));
-    const tours = await query;
-
-    res.status(200).json({ status: 'Success', result: tours.length, tours });
-  } catch (err) {
-    res.status(400).json({ status: 'Fail', message: err });
+  let query = Tour.find(JSON.parse(queryStr));
+  //Sorting;
+  if (req.query.sort) {
+    const sortBy = query.sort.split(',').join(' ');
+    console.log('exports.getAllTours -> query', query);
+    console.log('exports.getAllTours -> sortBy', sortBy);
+    query = query.sort(sortBy);
   }
+
+  // selecting fields
+  if (req.query.fields) {
+    const fields = query.fields.split(',').join(' ');
+    query = query.select(fields);
+  } else {
+    query = query.select('-__v');
+  }
+
+  // Pagi/zng and limit (pagination)
+  const page = req.query.page * 1 || 1;
+  const limit = req.query.limit * 1 || 50;
+  const skip = (page - 1) * limit;
+
+  // handling the out of page request
+  if (req.query.page) {
+    const totalTours = await Tour.countDocuments();
+    if (skip >= totalTours) {
+      throw new Error("This request couldn't be processed");
+    }
+  }
+
+  query = query.skip(skip).limit(limit);
+*/
+  const features = new APIFeatures(Tour, req.query)
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
+  const tours = await features.query;
+
+  res.status(200).json({ status: 'Success', result: tours.length, tours });
 };
 
 exports.getTourById = async (req, res) => {
